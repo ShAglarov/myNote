@@ -32,10 +32,10 @@ struct NoteList: Codable, Equatable {
     }
     
     static func loadSimpleNote() -> [NoteList] {
-        let simpleNote = NoteList(title: "Позвонить Роме",
+        let simpleNote = NoteList(title: "Первоначальная цель",
                                   isComplete: false,
                                   dueDate: Date(),
-                                  notes: "Попросить уволить меня с работы")
+                                  notes: "Выполнить все поставленные задачи")
         return [simpleNote]
     }
     
@@ -43,7 +43,7 @@ struct NoteList: Codable, Equatable {
         .default
         .urls(for: .documentDirectory, in: .userDomainMask).first!
     
-    static let archiveURL = documentDirectory.appendingPathComponent("nt")
+    static let archiveURL = documentDirectory.appendingPathComponent("dataBase")
         .appendingPathExtension("plist")
     
     static func loadDataContent() -> [NoteList]? {
