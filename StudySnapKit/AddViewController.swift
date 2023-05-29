@@ -67,130 +67,109 @@ extension AddViewController {
         
         menuView = {
             let headerLbl = UILabel()
-                headerLbl.translatesAutoresizingMaskIntoConstraints = false
-                view.addSubview(headerLbl)
-                headerLbl.text = "Заголовок"
-                headerLbl.textAlignment = .left
-                headerLbl.textColor = .lightGray
+            headerLbl.text = "Заголовок"
+            headerLbl.textAlignment = .left
+            headerLbl.textColor = .lightGray
+            view.addSubview(headerLbl)
             
             let menu = UIView()
-            
-            menu.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(menu)
             menu.layer.borderWidth = 0.5
             menu.layer.borderColor = UIColor.gray.cgColor
+            view.addSubview(menu)
             
-            NSLayoutConstraint.activate([
-                menu.topAnchor
-                    .constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
-                menu.leftAnchor
-                    .constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-                menu.rightAnchor
-                    .constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-                menu.heightAnchor
-                    .constraint(equalToConstant: 40),
-                
-                headerLbl.bottomAnchor.constraint(equalTo: menu.topAnchor, constant: 0),
-                headerLbl.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor,
-                                            constant: 10)
-            ])
+            menu.snp.makeConstraints { (make) in
+                make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(25)
+                make.left.right.equalTo(view.safeAreaLayoutGuide)
+                make.height.equalTo(40)
+            }
+            headerLbl.snp.makeConstraints { (make) in
+                make.bottom.equalTo(menu.snp.top)
+                make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(10)
+            }
             
             return menu
         }()
         
         dateMenu = {
-            
             let headerLeftLbl = UILabel()
-            headerLeftLbl.translatesAutoresizingMaskIntoConstraints = false
-                view.addSubview(headerLeftLbl)
             headerLeftLbl.text = "Выберите дату и время напоминания"
             headerLeftLbl.textColor = .black
+            view.addSubview(headerLeftLbl)
             
             let menu = UIView()
-            
-            menu.translatesAutoresizingMaskIntoConstraints = false
-            view.addSubview(menu)
             menu.layer.borderWidth = 0.5
             menu.layer.borderColor = UIColor.gray.cgColor
+            view.addSubview(menu)
             
-            NSLayoutConstraint.activate([
-                menu.topAnchor
-                    .constraint(equalTo: menuView.bottomAnchor, constant: 20),
-                menu.leftAnchor
-                    .constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
-                menu.rightAnchor
-                    .constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-                menu.heightAnchor
-                    .constraint(equalToConstant: 40),
-                
-                headerLeftLbl.centerXAnchor.constraint(equalTo: menu.centerXAnchor),
-                headerLeftLbl.centerYAnchor.constraint(equalTo: menu.centerYAnchor)
-            ])
+            menu.snp.makeConstraints { (make) in
+                make.top.equalTo(menuView.snp.bottom).offset(20)
+                make.left.right.equalTo(view.safeAreaLayoutGuide)
+                make.height.equalTo(40)
+            }
+            
+            headerLeftLbl.snp.makeConstraints { (make) in
+                make.centerX.centerY.equalTo(menu)
+            }
             
             return menu
         }()
         
         isCompleteBtn = {
             let button = UIButton()
-            button.translatesAutoresizingMaskIntoConstraints = false
-            menuView.addSubview(button)
             button.setImage(UIImage(systemName: "circle"), for: .normal)
+            menuView.addSubview(button)
             
-            NSLayoutConstraint.activate([
-                button.leadingAnchor
-                    .constraint(equalTo: menuView.leadingAnchor, constant: 8),
-                button.centerYAnchor
-                    .constraint(equalTo: menuView.centerYAnchor),
-                button.widthAnchor
-                    .constraint(equalToConstant: 30),
-                button.heightAnchor
-                    .constraint(equalToConstant: 30)
-            ])
+            button.snp.makeConstraints { (make) in
+                make.leading.equalTo(menuView.snp.leading).offset(8)
+                make.centerY.equalTo(menuView)
+                make.width.height.equalTo(30)
+            }
+            
             return button
         }()
         
         titleTF = {
-                    let textField = UITextField()
-                    textField.translatesAutoresizingMaskIntoConstraints = false
-                    textField.placeholder = "Введите заголовок"
-                    menuView.addSubview(textField)
-                    NSLayoutConstraint.activate([
-                        textField.centerYAnchor.constraint(equalTo: menuView.centerYAnchor),
-                        textField.leftAnchor.constraint(equalTo: isCompleteBtn.rightAnchor, constant: 8),
-                        textField.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -8),
-                    ])
-                    return textField
-                }()
+            let textField = UITextField()
+            textField.placeholder = "Введите заголовок"
+            menuView.addSubview(textField)
+            
+            textField.snp.makeConstraints { (make) in
+                make.centerY.equalTo(menuView)
+                make.left.equalTo(isCompleteBtn.snp.right).offset(8)
+                make.right.equalTo(view.snp.right).offset(-8)
+            }
+            
+            return textField
+        }()
         
         dueDatePicker = {
             let date = UIDatePicker()
-            date.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addSubview(date)
-            
             date.preferredDatePickerStyle = .wheels
             date.minimumDate = Date()
+            view.addSubview(date)
             
-            NSLayoutConstraint.activate([
-                date.topAnchor.constraint(equalTo: dateMenu.bottomAnchor),
-                date.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            ])
+            date.snp.makeConstraints { (make) in
+                make.top.equalTo(dateMenu.snp.bottom)
+                make.centerX.equalTo(view)
+            }
+            
             return date
         }()
         
         notesTV = {
             let textView = UITextView()
-            textView.translatesAutoresizingMaskIntoConstraints = false
             textView.layer.borderWidth = 0.5
             textView.layer.borderColor = UIColor.black.cgColor
             textView.layer.cornerRadius = 10.0
+            view.addSubview(textView)
             
-            self.view.addSubview(textView)
-            NSLayoutConstraint.activate([
-                textView.topAnchor.constraint(equalTo: dueDatePicker.bottomAnchor, constant: 8),
-                textView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 8),
-                textView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -8),
-                textView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -23),
-            ])
+            textView.snp.makeConstraints { (make) in
+                make.top.equalTo(dueDatePicker.snp.bottom).offset(8)
+                make.left.equalTo(view.snp.left).offset(8)
+                make.right.equalTo(view.snp.right).offset(-8)
+                make.bottom.equalTo(view.snp.bottom).offset(-23)
+            }
+            
             return textView
         }()
     }

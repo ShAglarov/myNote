@@ -36,14 +36,18 @@ struct NoteList: Codable, Equatable {
                                   isComplete: false,
                                   dueDate: Date(),
                                   notes: "Выполнить все поставленные задачи")
-        return [simpleNote]
+        let simpleNoteTwo = NoteList(title: "Вторая цель",
+                                  isComplete: false,
+                                  dueDate: Date(),
+                                  notes: "Проверить все ли выполнено")
+        return [simpleNote, simpleNoteTwo]
     }
     
     static let documentDirectory = FileManager
         .default
         .urls(for: .documentDirectory, in: .userDomainMask).first!
     
-    static let archiveURL = documentDirectory.appendingPathComponent("dataBase")
+    static let archiveURL = documentDirectory.appendingPathComponent("q")
         .appendingPathExtension("plist")
     
     static func loadDataContent() -> [NoteList]? {

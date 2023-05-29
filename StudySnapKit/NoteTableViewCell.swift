@@ -24,9 +24,9 @@ class NoteTableViewCell: UITableViewCell {
     
     //MARK: - Button and Label Customization
     
-    var isCompleteBtn: UIButton!
-    var titleLbl: UILabel!
-    var dateLbl: UILabel!
+    var isCompleteBtn = UIButton()
+    var titleLbl = UILabel()
+    var dateLbl = UILabel()
     
     //MARK: - InitStyle
     
@@ -53,24 +53,6 @@ class NoteTableViewCell: UITableViewCell {
 extension NoteTableViewCell {
     
     func setupConfigureConstraints() {
-        
-        isCompleteBtn = {
-            let button = UIButton()
-            button.translatesAutoresizingMaskIntoConstraints = false
-            return button
-        }()
-        
-        titleLbl = {
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            return label
-        }()
-        
-        dateLbl = {
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            return label
-        }()
         
         contentView.addSubview(isCompleteBtn)
         contentView.addSubview(titleLbl)

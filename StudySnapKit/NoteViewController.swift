@@ -12,20 +12,19 @@ protocol NoteTableViewCellDelegate {
     func checkMarkTapped(sender: UITableViewCell)
 }
 
-    //MARK: - Class ViewController
+//MARK: - Class ViewController
 
 class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var noteLists = [NoteList]()
+    var isAnyCellChecked: Bool = false
     
-        let tableView: UITableView = {
-            let table = UITableView()
-            
-            table.register(NoteTableViewCell.self, forCellReuseIdentifier: "cell")
-            
-            table.translatesAutoresizingMaskIntoConstraints = false
-            return table
-        }()
+    let tableView: UITableView = {
+        let table = UITableView()
+        
+        table.register(NoteTableViewCell.self, forCellReuseIdentifier: "cell")
+        return table
+    }()
     
     func didSelect(note: NoteList) {
         
@@ -59,8 +58,18 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         } else {
             noteLists += NoteList.loadSimpleNote()
         }
-        
     }
+    
+    override func setEditing(_ editing: Bool, animated: Bool) {
+        super.setEditing(editing, animated: animated)
+        
+        if editing {
+            print("Edit")
+        } else {
+            print("noEdit")
+        }
+    }
+    
     //MARK: - viewDidLayoutSubviews()
     
     override func viewDidLayoutSubviews() {
@@ -113,10 +122,16 @@ extension NoteViewController: NoteTableViewCellDelegate {
     func checkMarkTapped(sender: UITableViewCell) {
         if let indexPath = tableView.indexPath(for: sender) {
             
-            noteLists[indexPath.row].isComplete.toggle()
+            // Если ячейка уже отмечена или нет других отмеченных ячеек
+            if noteLists[indexPath.row].isComplete || !isAnyCellChecked {
+                noteLists[indexPath.row].isComplete.toggle()
+            }
+            
+            // Обновить флаг, если хотя бы одна ячейка отмечена
+            isAnyCellChecked = noteLists.contains { $0.isComplete }
             
             tableView.reloadRows(at: [indexPath], with: .automatic)
-            
+
             NoteList.saveData(noteListArray: noteLists)
         }
     }
