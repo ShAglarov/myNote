@@ -150,16 +150,24 @@ extension NoteViewController: NoteTableViewCellDelegate {
     func checkMarkTapped(sender: UITableViewCell) {
         if let indexPath = tableView.indexPath(for: sender) {
             
-            // Если ячейка уже отмечена или нет других отмеченных ячеек
-            if noteLists[indexPath.row].isComplete || !(isAnyCellChecked ?? false) {
-                noteLists[indexPath.row].isComplete.toggle()
-                indexPathSelectedRow = indexPath
+            // Если выбранная ячейка уже отмечена, снимаем отметку
+            if noteLists[indexPath.row].isComplete {
+                noteLists[indexPath.row].isComplete = false
+            } else {
+                // Иначе, снимаем отметку со всех других ячеек
+                for (index, _) in noteLists.enumerated() {
+                    noteLists[index].isComplete = false
+                }
+                
+                // устанавливаем отметку для выбранной ячейки
+                noteLists[indexPath.row].isComplete = true
+                indexPathSelectedRow = indexPath // Обновляем indexPathSelectedRow при выборе новой ячейки
             }
             
             // Обновить флаг, если хотя бы одна ячейка отмечена то isAnyCellChecked = true
             isAnyCellChecked = noteLists.contains { $0.isComplete }
             print(indexPath)
-            tableView.reloadRows(at: [indexPath], with: .automatic)
+            tableView.reloadData() // Обновляем все ячейки таблицы
             NoteList.saveData(noteListArray: noteLists)
         }
     }
