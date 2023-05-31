@@ -7,9 +7,19 @@
 
 import UIKit
 
+protocol AddViewControllerDelegate: AnyObject {
+    func noteUpdated(note: NoteList)
+}
+
 class AddViewController: UIViewController {
     
     var toNoteList: NoteList?
+    
+//    var selectedDate: Date = Date() {
+//        didSet {
+//            dueDatePicker.date = selectedDate
+//        }
+//    }
     
     //MARK: - interface declaration
     
@@ -20,10 +30,19 @@ class AddViewController: UIViewController {
     var isCompleteBtn: UIButton!
     var dueDatePicker: UIDatePicker!
     var notesTV: UITextView!
-    
-    @objc func saveBtnTarget() {
-        print("save")
+
+    var note: NoteList? {
+        didSet {
+            loadViewIfNeeded()
+            titleTF.text = note?.title
+            dueDatePicker.date = note?.dueDate ?? Date()
+            isComplete = note?.isComplete ?? false
+            notesTV.text = note?.notes
+        }
     }
+    
+    weak var sendNoteDelegate: AddViewControllerDelegate?
+    
     //MARK: - Setting state image, for button isCompleteBtn
     
     var isComplete = false {
@@ -34,14 +53,6 @@ class AddViewController: UIViewController {
                 isCompleteBtn.setImage(UIImage(systemName: "circle"), for: .normal)
             }
         }
-    }
-    
-    func formatter(_ date: Date) -> String {
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.YYYY"
-        
-        return formatter.string(from: date)
     }
     
     //MARK: - viewDidLoad()
@@ -55,6 +66,11 @@ class AddViewController: UIViewController {
         
         navigationItem.rightBarButtonItem = saveBtn
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done,
+                                                           target: self,
+                                                           action: #selector(backMenu)
+        )
+
         setupConfigureConstraints()
     }
 }
@@ -62,6 +78,25 @@ class AddViewController: UIViewController {
 //MARK: - Interface сustomization
 
 extension AddViewController {
+    
+    @objc func saveBtnTarget() {
+        
+        sendNoteDelegate?
+            .noteUpdated(
+                note:NoteList(
+                             title: titleTF.text,
+                             isComplete: true,
+                             dueDate: dueDatePicker.date,
+                             notes: notesTV.text
+                           )
+        )
+        
+        navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func backMenu() {
+        navigationController?.popToRootViewController(animated: true)
+    }
     
     func setupConfigureConstraints() {
         

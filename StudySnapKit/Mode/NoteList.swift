@@ -15,13 +15,13 @@ struct NoteList: Codable, Equatable {
     var dueDate: Date
     var notes: String?
     
-    init(title: String,
+    init(title: String?,
          isComplete: Bool,
          dueDate: Date,
          notes: String?)
     {
         self.id = UUID()
-        self.title = title
+        self.title = title ?? ""
         self.isComplete = isComplete
         self.dueDate = dueDate
         self.notes = notes

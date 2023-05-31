@@ -54,6 +54,23 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		4B39BD8E2A2647340082D674 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4BCA7CA72A2511B00054C7F8 /* NoteViewController.swift */,
+				4B0F231C2A2554580050CC99 /* AddViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4B39BD8F2A26474A0082D674 /* TableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				4BCA7CBE2A251D640054C7F8 /* NoteTableViewCell.swift */,
+			);
+			path = TableViewCell;
+			sourceTree = "<group>";
+		};
 		4BCA7C972A2511B00054C7F8 = {
 			isa = PBXGroup;
 			children = (
@@ -77,9 +94,8 @@
 			children = (
 				4BCA7CA32A2511B00054C7F8 /* AppDelegate.swift */,
 				4BCA7CA52A2511B00054C7F8 /* SceneDelegate.swift */,
-				4BCA7CA72A2511B00054C7F8 /* NoteViewController.swift */,
-				4BCA7CBE2A251D640054C7F8 /* NoteTableViewCell.swift */,
-				4B0F231C2A2554580050CC99 /* AddViewController.swift */,
+				4B39BD8F2A26474A0082D674 /* TableViewCell */,
+				4B39BD8E2A2647340082D674 /* View */,
 				4BCA7CC02A252D940054C7F8 /* Mode */,
 				4BCA7CAC2A2511B30054C7F8 /* Assets.xcassets */,
 				4BCA7CAE2A2511B30054C7F8 /* LaunchScreen.storyboard */,

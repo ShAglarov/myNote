@@ -17,7 +17,9 @@ protocol NoteTableViewCellDelegate {
 class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var noteLists = [NoteList]()
-    var isAnyCellChecked: Bool = false
+    var indexPathSelectedRow: IndexPath?
+    
+    var isAnyCellChecked: Bool?
     
     let tableView: UITableView = {
         let table = UITableView()
@@ -25,6 +27,8 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         table.register(NoteTableViewCell.self, forCellReuseIdentifier: "cell")
         return table
     }()
+    
+    var didRegister: (NoteList) -> () = { _ in}
     
     func didSelect(note: NoteList) {
         
@@ -45,28 +49,45 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         view.backgroundColor = .systemBackground
         view.addSubview(tableView)
-        navigationItem.title = "Home"
+        navigationItem.title = "Напоминание"
         
         tableView.dataSource = self
         tableView.delegate = self
         
+        let editButton = UIBarButtonItem(barButtonSystemItem: .edit,
+                                         target: self,
+                                         action: #selector(editButtonTapped)
+        )
         
-        navigationItem.leftBarButtonItem = self.editButtonItem
+        navigationItem.leftBarButtonItem = editButton
         
         if let savedToNotes = NoteList.loadDataContent() {
             noteLists += savedToNotes
         } else {
             noteLists += NoteList.loadSimpleNote()
         }
+        
+        // Проверяем, какие ячейки были отмечены
+        for (index, note) in noteLists.enumerated() {
+            if note.isComplete {
+                indexPathSelectedRow = IndexPath(row: index, section: 0)
+                isAnyCellChecked = note.isComplete
+            }
+        }
     }
     
-    override func setEditing(_ editing: Bool, animated: Bool) {
-        super.setEditing(editing, animated: animated)
+    
+    
+    @objc func editButtonTapped() {
+        let addVC = AddViewController()
+        addVC.sendNoteDelegate = self
         
-        if editing {
-            print("Edit")
-        } else {
-            print("noEdit")
+        // если при нажатии кнопки Edit хотя бы один флажок включен,
+        //то переходим в режим редактирования этой ячейки
+        if noteLists.contains(where: { $0.isComplete }) {
+            //didRegister(noteLists[indexPathSelectedRow?.row ?? 10])
+            addVC.note = noteLists[indexPathSelectedRow?.row ?? 10]
+            navigationController?.pushViewController(addVC, animated: true)
         }
     }
     
@@ -80,7 +101,14 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
             make.left.right.equalToSuperview()
             make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom)
         }
+    }
+    
+    func formatter(_ date: Date) -> String {
         
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.YYYY"
+        
+        return formatter.string(from: date)
     }
     
     // MARK: - UITableViewDataSource
@@ -100,7 +128,7 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         cell.isComplete = note.isComplete
         cell.titleLbl.text = note.title
-        cell.dateLbl.text = dateFormatter.string(from: Date())
+        cell.dateLbl.text = formatter(noteLists[indexPath.row].dueDate)
         cell.delegate = self
         
         return cell
@@ -123,16 +151,31 @@ extension NoteViewController: NoteTableViewCellDelegate {
         if let indexPath = tableView.indexPath(for: sender) {
             
             // Если ячейка уже отмечена или нет других отмеченных ячеек
-            if noteLists[indexPath.row].isComplete || !isAnyCellChecked {
+            if noteLists[indexPath.row].isComplete || !(isAnyCellChecked ?? false) {
                 noteLists[indexPath.row].isComplete.toggle()
+                indexPathSelectedRow = indexPath
             }
             
-            // Обновить флаг, если хотя бы одна ячейка отмечена
+            // Обновить флаг, если хотя бы одна ячейка отмечена то isAnyCellChecked = true
             isAnyCellChecked = noteLists.contains { $0.isComplete }
-            
+            print(indexPath)
             tableView.reloadRows(at: [indexPath], with: .automatic)
-
             NoteList.saveData(noteListArray: noteLists)
         }
     }
 }
+
+extension NoteViewController: AddViewControllerDelegate {
+    func noteUpdated(note: NoteList) {
+        // Находим соответствующую ячейку и обновляем ее
+        
+        guard let indexPath = indexPathSelectedRow else {
+            return
+        }
+        
+        noteLists[indexPath.row] = note
+        tableView.reloadData()
+        NoteList.saveData(noteListArray: noteLists)
+    }
+}
+

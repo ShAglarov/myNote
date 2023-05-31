@@ -27,7 +27,6 @@ class NoteTableViewCell: UITableViewCell {
     var isCompleteBtn = UIButton()
     var titleLbl = UILabel()
     var dateLbl = UILabel()
-    
     //MARK: - InitStyle
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
