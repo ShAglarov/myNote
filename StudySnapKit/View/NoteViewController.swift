@@ -58,8 +58,10 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
                                          target: self,
                                          action: #selector(editButtonTapped)
         )
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonTapped))
         
         navigationItem.leftBarButtonItem = editButton
+        navigationItem.rightBarButtonItem = addButton
         
         if let savedToNotes = NoteList.loadDataContent() {
             noteLists += savedToNotes
@@ -76,8 +78,6 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
-    
-    
     @objc func editButtonTapped() {
         let addVC = AddViewController()
         addVC.sendNoteDelegate = self
@@ -88,7 +88,23 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
             //didRegister(noteLists[indexPathSelectedRow?.row ?? 10])
             addVC.note = noteLists[indexPathSelectedRow?.row ?? 10]
             navigationController?.pushViewController(addVC, animated: true)
+        } else {
+            
+            let notSelectedItem = UIAlertController(title: "Выберите ячейку",
+                                                    message: "Для редактирования напоминания, следует выбрать хотя-бы одну ячейку", preferredStyle: .alert)
+            let closeAlertAction = UIAlertAction(title: "Закрыть", style: .cancel)
+            
+            notSelectedItem.addAction(closeAlertAction)
+            
+            present(notSelectedItem, animated: true)
         }
+    }
+    
+    @objc func addButtonTapped() {
+        let addVC = AddViewController()
+        addVC.addNoteDelegate = self
+        
+        navigationController?.pushViewController(addVC, animated: true)
     }
     
     //MARK: - viewDidLayoutSubviews()
@@ -143,6 +159,18 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         didSelect(note: noteItem)
     }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if editingStyle == .delete {
+            
+            noteLists.remove(at: indexPath.row)
+            
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            NoteList.saveData(noteListArray: noteLists)
+        }
+    }
 }
 
 extension NoteViewController: NoteTableViewCellDelegate {
@@ -173,7 +201,7 @@ extension NoteViewController: NoteTableViewCellDelegate {
     }
 }
 
-extension NoteViewController: AddViewControllerDelegate {
+extension NoteViewController: AddEditingViewControllerDelegate {
     func noteUpdated(note: NoteList) {
         // Находим соответствующую ячейку и обновляем ее
         
@@ -187,3 +215,11 @@ extension NoteViewController: AddViewControllerDelegate {
     }
 }
 
+extension NoteViewController: AddNoteViewControllerDelegate {
+    
+    func noteAdded(note: NoteList) {
+        noteLists.append(note)
+        tableView.reloadData()
+        NoteList.saveData(noteListArray: noteLists)
+    }
+}

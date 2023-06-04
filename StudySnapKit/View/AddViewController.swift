@@ -7,19 +7,17 @@
 
 import UIKit
 
-protocol AddViewControllerDelegate: AnyObject {
+protocol AddEditingViewControllerDelegate: AnyObject {
     func noteUpdated(note: NoteList)
+}
+
+protocol AddNoteViewControllerDelegate: AnyObject {
+    func noteAdded(note: NoteList)
 }
 
 class AddViewController: UIViewController {
     
     var toNoteList: NoteList?
-    
-//    var selectedDate: Date = Date() {
-//        didSet {
-//            dueDatePicker.date = selectedDate
-//        }
-//    }
     
     //MARK: - interface declaration
     
@@ -30,7 +28,7 @@ class AddViewController: UIViewController {
     var isCompleteBtn: UIButton!
     var dueDatePicker: UIDatePicker!
     var notesTV: UITextView!
-
+    
     var note: NoteList? {
         didSet {
             loadViewIfNeeded()
@@ -41,7 +39,8 @@ class AddViewController: UIViewController {
         }
     }
     
-    weak var sendNoteDelegate: AddViewControllerDelegate?
+    weak var sendNoteDelegate: AddEditingViewControllerDelegate?
+    weak var addNoteDelegate: AddNoteViewControllerDelegate?
     
     //MARK: - Setting state image, for button isCompleteBtn
     
@@ -70,7 +69,7 @@ class AddViewController: UIViewController {
                                                            target: self,
                                                            action: #selector(backMenu)
         )
-
+        
         setupConfigureConstraints()
     }
 }
@@ -84,12 +83,20 @@ extension AddViewController {
         sendNoteDelegate?
             .noteUpdated(
                 note:NoteList(
-                             title: titleTF.text,
-                             isComplete: true,
-                             dueDate: dueDatePicker.date,
-                             notes: notesTV.text
-                           )
-        )
+                    title: titleTF.text,
+                    isComplete: isComplete,
+                    dueDate: dueDatePicker.date,
+                    notes: notesTV.text
+                )
+            )
+        
+        addNoteDelegate?
+            .noteAdded(note: NoteList(
+                title: titleTF.text,
+                isComplete: isComplete,
+                dueDate: dueDatePicker.date,
+                notes: notesTV.text
+            ))
         
         navigationController?.popViewController(animated: true)
     }
