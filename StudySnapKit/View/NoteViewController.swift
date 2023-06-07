@@ -14,8 +14,6 @@ protocol NoteTableViewCellDelegate {
 
 class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    
-    
     var noteListViewModel = NoteListViewModel()
     var selectedIndex = Int()
     
@@ -25,17 +23,6 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         table.register(NoteTableViewCell.self, forCellReuseIdentifier: "Cell")
         return table
     }()
-    
-    // при нажатии на ячейку пушим AlertViewController с подробной инфой о заметке
-    func didSelect(note: Note) {
-
-        let alertController = UIAlertController(title: note.title,
-                                                message: note.notes,
-                                                preferredStyle: .alert)
-        let alertAction = UIAlertAction(title: "Закрыть", style: .default)
-        alertController.addAction(alertAction)
-        present(alertController, animated: true)
-    }
     
     //MARK: - viewDidLoad()
     
@@ -51,14 +38,26 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         navigationItem.title = "Напоминание"
         
-        noteListViewModel.updateNotes()
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit,
-                                                           target: self,
-                                                           action: #selector(editButtonTapped))
+        
+        navigationItem.leftBarButtonItem =
+        UIBarButtonItem(barButtonSystemItem: .edit,
+                        target: self,
+                        action: #selector(editButtonTapped))
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        noteListViewModel.updateNotes()
     }
     
     @objc func editButtonTapped() {
+        //Проверяем была ли отмечена хотя бы одна заметка
+        guard noteListViewModel.isAnyNoteMarked() else {
+           // иначе вызываем сообщение пользователю
+           return showNoSelectionAlert()
+        }
         
         let editNoteViewController = EditNoteViewController()
         
@@ -88,7 +87,7 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as? NoteTableViewCell else {
             return UITableViewCell()
         }
-        // сохраняем данные выбранной ячейки
+        // сохраняем данные каждой ячейки
         guard let noteViewModel = noteListViewModel.noteViewModels[indexPath.row].note else { return UITableViewCell() }
         
         // Форма даты
@@ -109,12 +108,8 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         guard let noteItem = noteListViewModel.noteViewModels[indexPath.row].note else { return }
         
-        // сохраняем индекс выбранной ячейки
-        selectedIndex = indexPath.row
-        
-        
         // при нажатии на ячейку пушим AlertViewController с подробной инфой о заметке
-        didSelect(note: noteItem)
+        showDidSelect(note: noteItem)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -131,10 +126,37 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
 
 extension NoteViewController: NoteTableViewCellDelegate {
     
+    /// проверяем
     func checkMarkTapped(sender: UITableViewCell) {
         
         guard let indexPath = tableView.indexPath(for: sender) else { return }
         noteListViewModel.checkMarkTapped(at: indexPath.row)
+        self.selectedIndex = indexPath.row
         tableView.reloadData()
+    }
+}
+
+// MARK: - AlertControllers
+
+extension NoteViewController {
+    
+    /// если ни одна ячейка не выбрана, то выдаем предупреждение
+    func showNoSelectionAlert() {
+        
+        let alertController = UIAlertController(title: "Заметка не выбрана", message: "Какую заметку желаете редактировать?", preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Закрыть", style: .default)
+        alertController.addAction(alertAction)
+        present(alertController, animated: true)
+    }
+        
+    /// при нажатии на ячейку пушим AlertViewController с подробной инфой о заметке
+    func showDidSelect(note: Note) {
+        
+        let alertController = UIAlertController(title: note.title,
+                                                message: note.notes,
+                                                preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Закрыть", style: .default)
+        alertController.addAction(alertAction)
+        present(alertController, animated: true)
     }
 }

@@ -51,6 +51,10 @@ class EditNoteViewController: UIViewController {
         )
         
         setupConfigureConstraints()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
         guard let index = selectedIndex,
               let noteList = noteListViewModel?.noteViewModels[index].note else { return }

@@ -54,11 +54,11 @@ class NoteListViewModel: ObservableObject {
         saveNotes()
     }
     
-    /// Проверяем была ли отмечена хотя бы одна заметка, и возвращает индекс первой отмеченной заметки
+    // Проверяем была ли отмечена хотя бы одна заметка, и возвращает индекс первой отмеченной заметки
     func checkSelectedRows() -> (Int?, Bool?) {
         var indexSelectedNote: Int?
         var isAnyNoteChecked: Bool?
-        
+
         // Проверяем, какие заметки были отмечены
         for (index, noteViewModel) in noteViewModels.enumerated() {
             if noteViewModel.note?.isComplete ?? false {
@@ -69,6 +69,20 @@ class NoteListViewModel: ObservableObject {
         return (indexSelectedNote, isAnyNoteChecked)
     }
     
+    /// Проверяем была ли отмечена хотя бы одна заметка
+    func isAnyNoteMarked() -> Bool {
+
+        var isAnyNoteChecked: Bool?
+        
+        // Проверяем, какие заметки были отмечены
+        for noteViewModel in noteViewModels.enumerated() {
+            if noteViewModel.element.note?.isComplete ?? false {
+                isAnyNoteChecked = noteViewModel.element.note?.isComplete
+            }
+        }
+        return isAnyNoteChecked ?? false
+    }
+    /// по нажатию на ячейку, проверяем была ли активна другая ячейка, да то снимаем предыдущую отметку и стави отметку на новую выбранную ячейку
     func checkMarkTapped(at index: Int) {
         // Если выбранная ячейка уже отмечена, снимаем отметку
         if noteViewModels[index].note?.isComplete ?? false {
