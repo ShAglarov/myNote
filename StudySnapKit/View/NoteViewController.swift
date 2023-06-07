@@ -14,11 +14,10 @@ protocol NoteTableViewCellDelegate {
 
 class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    var updateCheckmarkButton = String()
     
-    //MARK: - viewDidLoad()
     
     var noteListViewModel = NoteListViewModel()
+    var selectedIndex = Int()
     
     let tableView: UITableView = {
         let table = UITableView()
@@ -27,8 +26,9 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return table
     }()
     
+    // при нажатии на ячейку пушим AlertViewController с подробной инфой о заметке
     func didSelect(note: Note) {
-        
+
         let alertController = UIAlertController(title: note.title,
                                                 message: note.notes,
                                                 preferredStyle: .alert)
@@ -36,6 +36,8 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         alertController.addAction(alertAction)
         present(alertController, animated: true)
     }
+    
+    //MARK: - viewDidLoad()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +52,20 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         navigationItem.title = "Напоминание"
         
         noteListViewModel.updateNotes()
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit,
+                                                           target: self,
+                                                           action: #selector(editButtonTapped))
+    }
+    
+    @objc func editButtonTapped() {
+        
+        let editNoteViewController = EditNoteViewController()
+        
+        editNoteViewController.noteListViewModel = self.noteListViewModel
+        editNoteViewController.selectedIndex = self.selectedIndex
+        
+        navigationController?.pushViewController(editNoteViewController, animated: true)
     }
     
     override func viewDidLayoutSubviews() {
@@ -92,6 +108,10 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         tableView.deselectRow(at: indexPath, animated: true)
         
         guard let noteItem = noteListViewModel.noteViewModels[indexPath.row].note else { return }
+        
+        // сохраняем индекс выбранной ячейки
+        selectedIndex = indexPath.row
+        
         
         // при нажатии на ячейку пушим AlertViewController с подробной инфой о заметке
         didSelect(note: noteItem)

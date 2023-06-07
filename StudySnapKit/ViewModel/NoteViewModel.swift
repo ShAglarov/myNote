@@ -7,29 +7,11 @@
 
 import Foundation
 
-class NoteViewModel: ObservableObject {
+class NoteViewModel: ObservableObject, Identifiable {
     
-    @Published var notes = [Note]()
-    private let noteService: NoteService
+    @Published var note: Note?
     
-    init(noteService: NoteService = NoteService()) {
-        self.noteService = noteService
-    }
-    
-    func loadNotes() {
-        notes = noteService.loadNotes() ?? []
-    }
-    
-    func saveNotes() {
-        noteService.saveNotes(notes: notes)
+    init(note: Note?) {
+        self.note = note
     }
 }
-
-
-
-
-
-
-
-
-
