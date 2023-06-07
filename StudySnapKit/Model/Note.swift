@@ -15,6 +15,18 @@ struct Note: Codable, Identifiable, Equatable {
     var dueDate: Date
     var notes: String?
     
+    init(title: String?,
+             isComplete: Bool,
+             dueDate: Date,
+             notes: String?)
+        {
+            self.id = UUID()
+            self.title = title ?? ""
+            self.isComplete = isComplete
+            self.dueDate = dueDate
+            self.notes = notes
+        }
+    
     static func == (lhs: Note, rhs: Note) -> Bool {
         return lhs.id == rhs.id
     }

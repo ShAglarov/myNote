@@ -9,23 +9,37 @@ import Foundation
 
 class NoteService {
     
-    private let documentDirectory = FileManager
-        .default
-        .urls(for: .documentDirectory, in: .userDomainMask).first!
+    enum NoteServiceError: Error {
+        case fileReadError
+        case fileWriteError
+    }
+    
+    private let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     
     private var archiveURL: URL {
-        documentDirectory.appendingPathComponent("q").appendingPathExtension("plist")
+        return documentDirectory.appendingPathComponent("q").appendingPathExtension("plist")
     }
     
-    func loadNotes() -> [Note]? {
-        guard let dataContent = try? Data(contentsOf: archiveURL) else { return nil }
+    func loadDataContent() throws -> [NoteViewModel] {
+        guard let dataContent = try? Data(contentsOf: archiveURL) else {
+            throw NoteServiceError.fileReadError
+        }
         let propertyListDecoder = PropertyListDecoder()
-        return try? propertyListDecoder.decode(Array<Note>.self, from: dataContent)
+        guard let notes = try? propertyListDecoder.decode(Array<Note>.self, from: dataContent) else {
+            throw NoteServiceError.fileReadError
+        }
+        return notes.map(NoteViewModel.init(note:))
     }
     
-    func saveNotes(notes: [Note]) {
+    func saveData(noteViewModels: [NoteViewModel]) throws {
         let propertyListEncode = PropertyListEncoder()
-        let encodedList = try? propertyListEncode.encode(notes)
-        try? encodedList?.write(to: archiveURL, options: .noFileProtection)
+        guard let encodedList = try? propertyListEncode.encode(noteViewModels.map { $0.note }) else {
+            throw NoteServiceError.fileWriteError
+        }
+        do {
+            try encodedList.write(to: archiveURL, options: .noFileProtection)
+        } catch {
+            throw NoteServiceError.fileWriteError
+        }
     }
 }
