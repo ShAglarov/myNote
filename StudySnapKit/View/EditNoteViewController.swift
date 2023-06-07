@@ -70,7 +70,14 @@ class EditNoteViewController: UIViewController {
 
 extension EditNoteViewController {
     
+    // по нажатию нопки save заменяем заметку на другую
     @objc func saveBtnTarget() {
+        
+        guard let index = selectedIndex else { return }
+        
+        let note = Note(title: titleTF.text, isComplete: isComplete, dueDate: dueDatePicker.date, notes: notesTV.text)
+        
+        noteListViewModel?.editNotes(note: note, index: index)
         
         navigationController?.popViewController(animated: true)
     }

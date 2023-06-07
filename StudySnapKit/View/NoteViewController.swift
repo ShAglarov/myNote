@@ -38,8 +38,6 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         navigationItem.title = "Напоминание"
         
-        
-        
         navigationItem.leftBarButtonItem =
         UIBarButtonItem(barButtonSystemItem: .edit,
                         target: self,
@@ -48,8 +46,8 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         noteListViewModel.updateNotes()
+        tableView.reloadData()
     }
     
     @objc func editButtonTapped() {

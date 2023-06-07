@@ -28,6 +28,12 @@ class NoteListViewModel: ObservableObject {
         }
     }
     
+    /// Редактируем определенную ячейку, и помещаем в него новое значение
+    func editNotes(note: Note, index: Int) {
+        noteViewModels[index].note = note
+        saveNotes()
+    }
+    
     /// Функция для сохранения данных в базу
     func saveNotes() {
         do {
