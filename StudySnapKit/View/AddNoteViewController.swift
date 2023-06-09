@@ -1,19 +1,17 @@
 //
-//  AddViewController.swift
+//  AddNoteViewController.swift
 //  StudySnapKit
 //
-//  Created by Shamil Aglarov on 30.05.2023.
+//  Created by Shamil Aglarov on 09.06.2023.
 //
 
 import UIKit
 
-class EditNoteViewController: UIViewController {
-    
-    var noteListViewModel: NoteListViewModel?
-    var selectedIndex: Int?
+class AddNoteViewController: UIViewController {
     
     //MARK: - interface declaration
     
+    var noteListViewModel: NoteListViewModel?
     private var menuView: UIView!
     private var dateMenu: UIView!
     private var titleTF: UITextField!
@@ -22,17 +20,6 @@ class EditNoteViewController: UIViewController {
     private var dueDatePicker: UIDatePicker!
     private var notesTV: UITextView!
 
-    //MARK: - Setting state image, for button isCompleteBtn
-    
-    private var isComplete = false {
-        didSet {
-            if isComplete {
-                isCompleteBtn.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .normal)
-            } else {
-                isCompleteBtn.setImage(UIImage(systemName: "circle"), for: .normal)
-            }
-        }
-    }
     
     //MARK: - viewDidLoad()
     
@@ -41,58 +28,40 @@ class EditNoteViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        let saveBtn = UIBarButtonItem(title: "Save",
-                                      style: .plain,
-                                      target: self,
-                                      action: #selector(saveBtnTarget))
-        
-        navigationItem.rightBarButtonItem = saveBtn
-        
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done,
                                                            target: self,
                                                            action: #selector(backMenu)
         )
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
+                                                            target: self,
+                                                            action: #selector(saveBtnTarget))
         
         setupConfigureConstraints()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        guard let index = selectedIndex,
-              let noteList = noteListViewModel?.noteViewModels[index].note else { return }
-        
-        titleTF.text = noteList.title
-        dueDatePicker.date = noteList.dueDate
-        isComplete = noteList.isComplete
-        notesTV.text = noteList.notes
     }
 }
 
 //MARK: - Interface сustomization
 
-extension EditNoteViewController {
+extension AddNoteViewController {
     
-    // по нажатию нопки save заменяем заметку на другую
-    @objc private func saveBtnTarget() {
-        guard let index = selectedIndex else { return }
+    @objc func saveBtnTarget() {
+        guard let noteListViewModel = noteListViewModel else { return }
         
-        let note = Note(title: titleTF.text,
-                        isComplete: isComplete,
-                        dueDate: dueDatePicker.date,
-                        notes: notesTV.text)
+        let newNote = Note(title: titleTF.text,
+                           isComplete: true,
+                           dueDate: dueDatePicker.date,
+                           notes: notesTV.text)
         
-        noteListViewModel?.editNotes(note: note,
-                                     index: index)
+        noteListViewModel.addNewNote(newNote)
         
-        navigationController?.popViewController(animated: true)
-    }
-    
-    @objc private func backMenu() {
         navigationController?.popToRootViewController(animated: true)
     }
     
-    private func setupConfigureConstraints() {
+    @objc func backMenu() {
+        navigationController?.popToRootViewController(animated: true)
+    }
+    
+    func setupConfigureConstraints() {
         menuView = {
             let headerLbl = UILabel()
             headerLbl.text = "Заголовок"

@@ -14,10 +14,10 @@ protocol NoteTableViewCellDelegate {
 
 class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    var noteListViewModel = NoteListViewModel()
-    var selectedIndex = Int()
+    private var noteListViewModel = NoteListViewModel()
+    private var selectedIndex = Int()
     
-    let tableView: UITableView = {
+    private let tableView: UITableView = {
         let table = UITableView()
         
         table.register(NoteTableViewCell.self, forCellReuseIdentifier: "Cell")
@@ -42,6 +42,11 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         UIBarButtonItem(barButtonSystemItem: .edit,
                         target: self,
                         action: #selector(editButtonTapped))
+        
+        navigationItem.rightBarButtonItem =
+        UIBarButtonItem(barButtonSystemItem: .add,
+                        target: self,
+                        action: #selector(jumpToAddViewController))
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -50,24 +55,9 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         tableView.reloadData()
     }
     
-    @objc func editButtonTapped() {
-        //Проверяем была ли отмечена хотя бы одна заметка
-        guard noteListViewModel.isAnyNoteMarked() else {
-           // иначе вызываем сообщение пользователю
-           return showNoSelectionAlert()
-        }
-        
-        let editNoteViewController = EditNoteViewController()
-        
-        editNoteViewController.noteListViewModel = self.noteListViewModel
-        editNoteViewController.selectedIndex = self.selectedIndex
-        
-        navigationController?.pushViewController(editNoteViewController, animated: true)
-    }
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        
+
         tableView.snp.makeConstraints { (make) in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
@@ -126,7 +116,6 @@ extension NoteViewController: NoteTableViewCellDelegate {
     
     /// проверяем
     func checkMarkTapped(sender: UITableViewCell) {
-        
         guard let indexPath = tableView.indexPath(for: sender) else { return }
         noteListViewModel.checkMarkTapped(at: indexPath.row)
         self.selectedIndex = indexPath.row
@@ -139,16 +128,19 @@ extension NoteViewController: NoteTableViewCellDelegate {
 extension NoteViewController {
     
     /// если ни одна ячейка не выбрана, то выдаем предупреждение
-    func showNoSelectionAlert() {
+    private func showNoSelectionAlert() {
+        let alertController = UIAlertController(title: "Заметка не выбрана",
+                                                message: "Какую заметку желаете редактировать?",
+                                                preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "Закрыть",
+                                        style: .default)
         
-        let alertController = UIAlertController(title: "Заметка не выбрана", message: "Какую заметку желаете редактировать?", preferredStyle: .alert)
-        let alertAction = UIAlertAction(title: "Закрыть", style: .default)
         alertController.addAction(alertAction)
         present(alertController, animated: true)
     }
-        
+    
     /// при нажатии на ячейку пушим AlertViewController с подробной инфой о заметке
-    func showDidSelect(note: Note) {
+    private func showDidSelect(note: Note) {
         
         let alertController = UIAlertController(title: note.title,
                                                 message: note.notes,
@@ -156,5 +148,29 @@ extension NoteViewController {
         let alertAction = UIAlertAction(title: "Закрыть", style: .default)
         alertController.addAction(alertAction)
         present(alertController, animated: true)
+    }
+}
+
+extension NoteViewController {
+    
+    @objc private func editButtonTapped() {
+        //Проверяем была ли отмечена хотя бы одна заметка
+        guard noteListViewModel.isAnyNoteMarked() else {
+            // иначе вызываем сообщение пользователю
+            return showNoSelectionAlert()
+        }
+        
+        let editNoteViewController = EditNoteViewController()
+        
+        editNoteViewController.noteListViewModel = self.noteListViewModel
+        editNoteViewController.selectedIndex = self.selectedIndex
+        
+        navigationController?.pushViewController(editNoteViewController, animated: true)
+    }
+    
+    @objc private func jumpToAddViewController() {
+        let addVC = AddNoteViewController()
+        addVC.noteListViewModel = self.noteListViewModel
+        navigationController?.pushViewController(addVC, animated: true)
     }
 }
