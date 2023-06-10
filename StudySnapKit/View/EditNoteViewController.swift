@@ -10,7 +10,7 @@ import UIKit
 class EditNoteViewController: UIViewController {
     
     var noteListViewModel: NoteListViewModel?
-    var selectedIndex: Int?
+    var selectedIndex: String?
     
     //MARK: - interface declaration
     
@@ -59,13 +59,15 @@ class EditNoteViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard let index = selectedIndex,
-              let noteList = noteListViewModel?.noteViewModels[index].note else { return }
-        
-        titleTF.text = noteList.title
-        dueDatePicker.date = noteList.dueDate
-        isComplete = noteList.isComplete
-        notesTV.text = noteList.notes
+        if let lastSelectedNoteId = UserDefaults.standard.string(forKey: "selectedNoteID"),
+           let note = noteListViewModel?
+            .noteViewModels.first(where: { $0.note?.id.uuidString == lastSelectedNoteId })?.note {
+            
+            titleTF.text = note.title
+            dueDatePicker.date = note.dueDate
+            isComplete = note.isComplete
+            notesTV.text = note.notes
+        }
     }
 }
 
@@ -83,7 +85,7 @@ extension EditNoteViewController {
                         notes: notesTV.text)
         
         noteListViewModel?.editNotes(note: note,
-                                     index: index)
+                                     id: index)
         
         navigationController?.popViewController(animated: true)
     }

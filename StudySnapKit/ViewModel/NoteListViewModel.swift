@@ -29,9 +29,12 @@ class NoteListViewModel: ObservableObject {
     }
     
     /// Редактируем определенную ячейку, и помещаем в него новое значение
-    func editNotes(note: Note, index: Int) {
-        noteViewModels[index].note = note
-        saveNotes()
+    func editNotes(note: Note, id: String) {
+        if let index = noteViewModels
+            .firstIndex(where: { $0.note?.id.uuidString == id }) {
+            noteViewModels[index].note = note
+            saveNotes()
+        }
     }
     
     /// Функция для сохранения данных в базу
@@ -101,6 +104,10 @@ class NoteListViewModel: ObservableObject {
             
             // устанавливаем отметку для выбранной ячейки
             noteViewModels[index].note?.isComplete = true
+            // преобразуем note.id в строку
+            let selectedNoteID = noteViewModels[index].note?.id.uuidString
+            //Сохраняем уникальный идентификатор послейдней выбранной ячейки indexPath
+            UserDefaults.standard.set(selectedNoteID, forKey: "selectedNoteID")
         }
         saveNotes()
     }

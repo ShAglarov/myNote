@@ -48,7 +48,7 @@ extension AddNoteViewController {
         guard let noteListViewModel = noteListViewModel else { return }
         
         let newNote = Note(title: titleTF.text,
-                           isComplete: true,
+                           isComplete: false,
                            dueDate: dueDatePicker.date,
                            notes: notesTV.text)
         

@@ -15,7 +15,7 @@ protocol NoteTableViewCellDelegate {
 class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     private var noteListViewModel = NoteListViewModel()
-    private var selectedIndex = Int()
+    private var selectedIndex: String?
     
     private let tableView: UITableView = {
         let table = UITableView()
@@ -23,6 +23,16 @@ class NoteViewController: UIViewController, UITableViewDataSource, UITableViewDe
         table.register(NoteTableViewCell.self, forCellReuseIdentifier: "Cell")
         return table
     }()
+    
+    init() {
+        // Загружаем selectedIndex из UserDefaults
+        selectedIndex = UserDefaults.standard.string(forKey: "selectedNoteID")
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     //MARK: - viewDidLoad()
     
@@ -117,8 +127,11 @@ extension NoteViewController: NoteTableViewCellDelegate {
     /// проверяем
     func checkMarkTapped(sender: UITableViewCell) {
         guard let indexPath = tableView.indexPath(for: sender) else { return }
+        
+        //по нажатию на ячейку, проверяем была ли активна другая ячейка,
+        //если да, то снимаем предыдущую отметку и стави отметку на новую выбранную ячейку
         noteListViewModel.checkMarkTapped(at: indexPath.row)
-        self.selectedIndex = indexPath.row
+        
         tableView.reloadData()
     }
 }
